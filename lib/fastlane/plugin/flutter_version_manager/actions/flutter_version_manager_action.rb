@@ -119,6 +119,7 @@ module Fastlane
         @pubspec_file_writter = FileWritter.new(pubspec_path)
         @git_reader = GitReader.new(git_path)
       end
+      
   
       def get_current_version_name
         "#{@version_reader.field('major')}.#{@version_reader.field('minor')}.#{@version_reader.field('patch')}"
@@ -151,6 +152,24 @@ module Fastlane
         @version_writter.write(context)
         update_pubspec
       end
+
+      # iOS update (code from https://github.com/SiarheiFedartsou/fastlane-plugin-versioning)
+      def select_build_configuration_predicate(name, configuration)
+        is_build_valid_configuration = configuration.isa == "XCBuildConfiguration" && !configuration.build_settings["PRODUCT_BUNDLE_IDENTIFIER"].nil?
+        is_build_valid_configuration &&= configuration.name == name unless name.nil?
+        return is_build_valid_configuration
+      end
+
+      def update_xcodeproj
+        project = Xcodeproj::Project.open('ios/Runner.xcodeproj')
+        configs = project.objects.select { |obj| select_build_configuration_predicate(nil, obj) }
+        configs.each do |config|
+          config.build_settings["MARKETING_VERSION"] = get_current_version_name
+          config.build_settings["CURRENT_PROJECT_VERSION"] = get_current_version_code
+        end
+        project.save
+      end
+      # iOS update end
       
       def update_pubspec
         previousVersion = @pubspec_yaml_reader.field('version')
@@ -159,6 +178,7 @@ module Fastlane
         @pubspec_file_writter.write(newContent)
         UI.message("Previous app version: #{previousVersion}")
         UI.message("New app version: #{newVersion}")
+        update_xcodeproj
       end
     end
   

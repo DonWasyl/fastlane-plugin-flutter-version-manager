@@ -2,6 +2,9 @@
 
 [![fastlane Plugin Badge](https://rawcdn.githack.com/fastlane/fastlane/master/fastlane/assets/plugin-badge.svg)](https://rubygems.org/gems/fastlane-plugin-flutter_version_manager)
 
+## About this fork
+The original version probably doesn't support $ (MARKETING_VERSION) variable and flavors. After a few changes, it started working;)
+
 ## Getting Started
 
 This project is a [_fastlane_](https://github.com/fastlane/fastlane) plugin. To get started with `fastlane-plugin-flutter_version_manager`, add it to your project by running:
